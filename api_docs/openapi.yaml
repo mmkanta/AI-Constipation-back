@@ -1,0 +1,76 @@
+openapi: "3.0.2"
+info:
+  title: AI-WEB API
+  version: "1.0"
+servers:
+  - url: http://localhost:5000/api/
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  # authentication
+  /auth/login:
+    $ref: "./routes/auth.yaml#/~1login"
+  /auth/logout:
+    $ref: "./routes/auth.yaml#/~1logout"
+    
+  # # user
+  # /users:
+  #   $ref: "./routes/user.yaml#/~1"
+  # /users/{id}:
+  #   $ref: "./routes/user.yaml#/~1getById"
+
+  # # web project
+  # /projects:
+  #   $ref: "./routes/webProject.yaml#/~1"
+  # /projects/manage:
+  #   $ref: "./routes/webProject.yaml#/~1manageUser"
+  # /projects/tasks:
+  #   $ref: "./routes/webProject.yaml#/~1getTasks"
+  # /projects/user/{id}:
+  #   $ref: "./routes/webProject.yaml#/~1getByUserId"
+  # /projects/{project_id}:
+  #   $ref: "./routes/webProject.yaml#/~1getById"
+  # /projects/delete/{project_id}:
+  #   $ref: "./routes/webProject.yaml#/~1deleteById"
+
+  # # vitals
+  # /vitals:
+  #   $ref: "./routes/vitals.yaml#/~1getByQuery"
+  # /vitals/records:
+  #   $ref: "./routes/vitals.yaml#/~1records"
+  # /vitals/projects/{id}/medrec:
+  #   $ref: "./routes/vitals.yaml#/~1getRecordByProjectId"
+  # /vitals/template/{project_id}:
+  #   $ref: "./routes/vitals.yaml#/~1getTemplate"
+  # /vitals/records/updaterow:
+  #   $ref: "./routes/vitals.yaml#/~1updateRecordRow"
+  # /vitals/records/deleterow:
+  #   $ref: "./routes/vitals.yaml#/~1deleteRecordRow"
+  # /vitals/records/deletefile/{id}/medrec:
+  #   $ref: "./routes/vitals.yaml#/~1deleteRecord"
+
+  # # inference
+  # /infer:
+  #   $ref: "./routes/infer.yaml#/~1"
+  # /infer/batch:
+  #   $ref: "./routes/infer.yaml#/~1batch"
+
+  # # report
+  # /report:
+  #   $ref: "./routes/report.yaml#/~1updatedById"
+  # /report/{rid}:
+  #   $ref: "./routes/report.yaml#/~1"
+  # /report/list/project/{project_id}:
+  #   $ref: "./routes/report.yaml#/~1getByProjectId"
+  # /report/delete/{rid}:
+  #   $ref: "./routes/report.yaml#/~1deleteById"
+
+  # # image
+  # /image:
+  #   $ref: "./routes/image.yaml#/~1"
