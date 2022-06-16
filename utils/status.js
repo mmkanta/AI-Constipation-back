@@ -3,7 +3,7 @@ const modelStatus = {
     IN_PROGRESS: "in progress",
     AI_ANNOTATED: "annotated",
     HUMAN_ANNOTATED: "reviewed",
-    FINALIZED: "finalized",
+    // FINALIZED: "finalized",
     CANCELED: "canceled"
 }
 

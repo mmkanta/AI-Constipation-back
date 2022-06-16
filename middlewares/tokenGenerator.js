@@ -8,7 +8,7 @@ const secret = process.env.SECRET_TOKEN;
 const generateToken = (data, remember) => {
   // generate jwt token when user login
   return jwt.sign(data, secret, {
-    expiresIn: remember ? "180d" : "24h",
+    expiresIn: remember ? "360d" : "24h",
     algorithm: 'HS256'
   });
 }

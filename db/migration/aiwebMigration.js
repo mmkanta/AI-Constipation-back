@@ -11,7 +11,7 @@ const webappSeed = async () => {
 
     const User = mongoose.model('users', schema)
     const PersonalInfo = mongoose.model('personal_infos', schema)
-    const Questionaire = mongoose.model('questionaires', schema)
+    const Questionnaire = mongoose.model('questionnaires', schema)
     const Image = mongoose.model('images', schema)
     const Report = mongoose.model('reports', schema)
     const Project = mongoose.model('projects', schema)
@@ -20,7 +20,7 @@ const webappSeed = async () => {
 
     await User.collection.drop()
     await PersonalInfo.collection.drop()
-    await Questionaire.collection.drop()
+    await Questionnaire.collection.drop()
     await Image.collection.drop()
     await Report.collection.drop()
     await Project.collection.drop()

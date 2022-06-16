@@ -34,13 +34,12 @@
       build: ./webapp-model
       ports:
         - '7000:7000'
-        - '11112:11112'
       volumes:
         - /webapp-model/resources:/code/resources
       env_file:
         - ./.env
     mongo:
-      image: mongo:4.0.3
+      image: mongo:4.4.7
       container_name: mongo
       ports:
         - '27018:27017' # host_port:container_port
@@ -97,6 +96,7 @@
 
    # BACKEND
    PY_SERVER=http://webapp-model:7000
+   ```
 
 3. Build docker compose. Frontend, backend, and model will be run at port 80, 5000, and 7000
    ```

@@ -55,11 +55,11 @@ paths:
   # /vitals/records/deletefile/{id}/medrec:
   #   $ref: "./routes/vitals.yaml#/~1deleteRecord"
 
-  # # inference
-  # /infer:
-  #   $ref: "./routes/infer.yaml#/~1"
-  # /infer/batch:
-  #   $ref: "./routes/infer.yaml#/~1batch"
+  # inference
+  /infer/questionnaire:
+    $ref: "./routes/infer.yaml#/~1questionnaire"
+  /infer/image:
+    $ref: "./routes/infer.yaml#/~1image"
 
   # # report
   # /report:

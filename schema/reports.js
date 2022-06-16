@@ -11,7 +11,7 @@ const db = require('../db/aiweb');
 
 const schema = new Schema(
     {
-        question_id: { type: ObjectId, ref: "questionaires" },
+        question_id: { type: ObjectId, ref: "questionnaires" },
         image_id: { type: ObjectId, ref: "images" },
         project_id: { type: ObjectId, ref: "projects" },
         status: { type: String }, // in progress, annotated, reviewed, finalized, canceled

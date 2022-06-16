@@ -1,0 +1,171 @@
+/questionnaire:
+  post:
+    summary: Questionnaire inference
+    tags:
+      - Inference
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              questionnaire:
+                type: object
+                properties:
+                  fdisc: 
+                    type: number
+                  sev3: 
+                    type: number
+                  fdiscxsev3: 
+                    type: number
+                  dur3: 
+                    type: number
+                  fstool: 
+                    type: number
+                  incomplete: 
+                    type: number
+                  strain: 
+                    type: number
+                  hard: 
+                    type: number
+                  block: 
+                    type: number
+                  digit: 
+                    type: number
+                  ppd: 
+                    type: number
+                  sev9: 
+                    type: number
+                  ppdxsev9: 
+                    type: number
+                  dur9: 
+                    type: number
+                  scalesev: 
+                    type: number              
+              personalInfo:
+                type: object
+                properties:
+                  hospital:
+                    type: string
+                  hn:
+                    type: string
+                  name:
+                    type: string
+                  gender:
+                    type: string
+                  age: 
+                    type: number
+    responses:
+      200:
+        description: Success
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/successResponse"
+      400:
+        description: Invalid input
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/badReqResponse"
+      401:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/unauthorizedResponse"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/errorResponse"
+
+/image:
+  post:
+    summary: Image inference
+    tags:
+      - Inference
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              personalInfo:
+                type: object
+                properties:
+                  hospital:
+                    type: string
+                  hn:
+                    type: string
+                  name:
+                    type: string
+                  gender:
+                    type: string
+                  age: 
+                    type: number
+              file:
+                type: string
+                format: binary
+    responses:
+      200:
+        description: Success
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/successResponse"
+      400:
+        description: Invalid input
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/badReqResponse"
+      401:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/unauthorizedResponse"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/errorResponse"
+
+components:
+  successResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+      data:
+        type: object
+  badReqResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+  unauthorizedResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+  errorResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+      error:
+        type: string

@@ -4,27 +4,27 @@ const db = require('../db/aiweb')
 
 const schema = new Schema(
     {
-        fdisc: { type: String },
-        sev3: { type: String },
-        // fdiscxsev3: { type: String },
-        dur3: { type: String },
-        fstool: { type: String },
-        incomplete: { type: String },
-        strain: { type: String },
-        hard: { type: String },
-        block: { type: String },
-        digit: { type: String },
-        ppd: { type: String },
-        sev9: { type: String },
-        // ppdxsev9: { type: String },
-        dur9: { type: String },
-        scalesev: { type: String }
+        fdisc: { type: Number },
+        sev3: { type: Number },
+        fdiscxsev3: { type: Number },
+        dur3: { type: Number },
+        fstool: { type: Number },
+        incomplete: { type: Number },
+        strain: { type: Number },
+        hard: { type: Number },
+        block: { type: Number },
+        digit: { type: Number },
+        ppd: { type: Number },
+        sev9: { type: Number },
+        ppdxsev9: { type: Number },
+        dur9: { type: Number },
+        scalesev: { type: Number }
     },
     {
         timestamps: true
     }
 );
 
-const Questionaire = db.model("questionaires", schema);
+const Questionnaire = db.model("questionnaires", schema);
 
-module.exports = Questionaire;
+module.exports = Questionnaire;
