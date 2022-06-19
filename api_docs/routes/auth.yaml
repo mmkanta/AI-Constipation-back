@@ -1,0 +1,94 @@
+/login:
+  post:
+    summary: Login
+    tags:
+      - Authentication
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              username:
+                type: string
+                example: john
+              password:
+                type: string
+                example: xxxxxxxx
+              remember:
+                type: boolean
+                summary: true for 'remember me'
+    responses:
+      200:
+        description: Success
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/successResponse"
+      401:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/unauthorizedResponse"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/errorResponse"
+
+/logout:
+  post:
+    summary: Logout
+    tags:
+      - Authentication
+    security:
+      - bearerAuth: []
+    responses:
+      200:
+        description: Success
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/successResponse"
+      401:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/unauthorizedResponse"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/errorResponse"
+
+components:
+  successResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+      data:
+        type: object
+  unauthorizedResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+  errorResponse:
+    type: object
+    properties:
+      success:
+        type: boolean
+      message:
+        type: string
+      error:
+        type: string
