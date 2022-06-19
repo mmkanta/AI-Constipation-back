@@ -4,17 +4,17 @@ const db = require('../db/aiweb')
 
 const schema = new Schema(
     {
-        hospital: { type: String },
-        hn: { type: String },
-        name: { type: String },
-        gender: { type: String },
-        age: { type: Number }
+        hospital: { type: String, required: true },
+        hn: { type: String, required: true },
+        name: { type: String, required: true },
+        gender: { type: String, required: true },
+        age: { type: Number, required: true }
     },
     {
         timestamps: true
     }
 );
 
-const PredClass = db.model("pred_classes", schema);
+const PersonalInfo = db.model("personal_infos", schema);
 
-module.exports = PredClass;
+module.exports = PersonalInfo;

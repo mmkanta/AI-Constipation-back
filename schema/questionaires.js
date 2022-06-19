@@ -4,21 +4,21 @@ const db = require('../db/aiweb')
 
 const schema = new Schema(
     {
-        fdisc: { type: Number },
-        sev3: { type: Number },
-        fdiscxsev3: { type: Number },
-        dur3: { type: Number },
-        fstool: { type: Number },
-        incomplete: { type: Number },
-        strain: { type: Number },
-        hard: { type: Number },
-        block: { type: Number },
-        digit: { type: Number },
-        ppd: { type: Number },
-        sev9: { type: Number },
-        ppdxsev9: { type: Number },
-        dur9: { type: Number },
-        scalesev: { type: Number }
+        fdisc: { type: Number, required: true },
+        sev3: { type: Number, required: true },
+        fdiscxsev3: { type: Number, required: true },
+        dur3: { type: Number, required: true },
+        fstool: { type: Number, required: true },
+        incomplete: { type: Number, required: true },
+        strain: { type: Number, required: true },
+        hard: { type: Number, required: true },
+        block: { type: Number, required: true },
+        digit: { type: Number, required: true },
+        ppd: { type: Number, required: true },
+        sev9: { type: Number, required: true },
+        ppdxsev9: { type: Number, required: true },
+        dur9: { type: Number, required: true },
+        scalesev: { type: Number, required: true }
     },
     {
         timestamps: true

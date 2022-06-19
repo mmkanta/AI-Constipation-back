@@ -104,4 +104,7 @@ dist
 .tern-port
 
 # resource
-/resources
+/resources/uploads/*
+/resources/reports/*
+!/resources/uploads/dummy.txt
+!/resources/reports/dummy.txt

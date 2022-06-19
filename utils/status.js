@@ -18,8 +18,15 @@ const userRole = {
     ADMIN: "admin"
 }
 
+const modelTask = {
+    QUESTIONNAIRE: "questionnaire",
+    IMAGE: "image",
+    INTEGRATED: "integrated"
+}
+
 module.exports = {
     modelStatus,
     userStatus,
-    userRole
+    userRole,
+    modelTask
 }

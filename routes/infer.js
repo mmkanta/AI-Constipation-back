@@ -3,9 +3,12 @@ const router = express.Router();
 const upload = require('../middlewares/uploadFile')
 const path = require('path')
 const inferController = require('../controllers/inferController')
+const tokenValidation = require('../middlewares/tokenVerification')
 
-router.post('/image', upload.single('file'), inferController.imageInfer);
+// questionnaire inference
+router.post('/image', tokenValidation, upload.single('file'), inferController.imageInfer);
 
-router.post('/questionnaire', inferController.questionnaireInfer);
+// image inference
+router.post('/questionnaire', tokenValidation, inferController.questionnaireInfer);
 
 module.exports = router;

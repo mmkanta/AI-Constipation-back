@@ -12,12 +12,23 @@ const db = require('../db/aiweb');
 const schema = new Schema(
     {
         question_id: { type: ObjectId, ref: "questionnaires" },
-        image_id: { type: ObjectId, ref: "images" },
-        project_id: { type: ObjectId, ref: "projects" },
-        status: { type: String }, // in progress, annotated, reviewed, finalized, canceled
-        label: { type: Object },
-        created_by: { type: ObjectId, ref: "users" },
+        personal_info_id: { type: ObjectId, ref: "personal_infos" },
+        task: { type: String, required: true },
+        status: { type: String },
+        DD_probability: { type: Number },
+        label: { type: String },
+        final_diag: { type: [String] },
+        ctt_result: { type: String },
+        anorectal_structural_abnormality: { type: String },
+        IBS: { type: Boolean },
+        cormorbidity: { type: String },
+        surgical_history: { type: Boolean },
+        surgical_history_note: { type: String },
+        comments: { type: String },
+        created_by: { type: ObjectId, ref: "users", required: true },
         updated_by: { type: ObjectId, ref: "users" },
+        gradcam_path: { type: String },
+        original_path: { type: String },
     },
     {
         timestamps: true

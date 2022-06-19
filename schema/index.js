@@ -1,8 +1,9 @@
 const User = require('./users')
 // const Project = require('./projects')
-// const MedRecord = require('./medRecords')
+const Questionnaire = require('./questionaires')
+const PersonalInfo = require('./personalInfos')
 // const Image = require('./images')
-// const PredResult = require('./predResults')
+const Report = require('./reports')
 // const Mask = require('./masks')
 // const PredClass = require('./predClasses')
 // const Gradcam = require('./gradcams')
@@ -11,9 +12,10 @@ const User = require('./users')
 module.exports = {
     User,
     // Project,
-    // MedRecord,
+    Questionnaire,
+    PersonalInfo,
     // Image,
-    // PredResult,
+    Report,
     // Mask,
     // PredClass,
     // Gradcam,

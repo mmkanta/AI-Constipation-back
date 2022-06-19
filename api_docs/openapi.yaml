@@ -18,12 +18,14 @@ paths:
     $ref: "./routes/auth.yaml#/~1login"
   /auth/logout:
     $ref: "./routes/auth.yaml#/~1logout"
-    
-  # # user
-  # /users:
-  #   $ref: "./routes/user.yaml#/~1"
-  # /users/{id}:
-  #   $ref: "./routes/user.yaml#/~1getById"
+
+  # user
+  /users:
+    $ref: "./routes/user.yaml#/~1"
+  /users/{user_id}:
+    $ref: "./routes/user.yaml#/~1getById"
+  /users/delete/{user_id}:
+    $ref: "./routes/user.yaml#/~1deleteById"
 
   # # web project
   # /projects:
@@ -61,16 +63,14 @@ paths:
   /infer/image:
     $ref: "./routes/infer.yaml#/~1image"
 
-  # # report
+  # report
   # /report:
   #   $ref: "./routes/report.yaml#/~1updatedById"
   # /report/{rid}:
   #   $ref: "./routes/report.yaml#/~1"
-  # /report/list/project/{project_id}:
-  #   $ref: "./routes/report.yaml#/~1getByProjectId"
+  /report/list:
+    $ref: "./routes/report.yaml#/~1getAllReports"
+  /report/image:
+    $ref: "./routes/report.yaml#/~1getImage"
   # /report/delete/{rid}:
   #   $ref: "./routes/report.yaml#/~1deleteById"
-
-  # # image
-  # /image:
-  #   $ref: "./routes/image.yaml#/~1"

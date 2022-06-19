@@ -12,20 +12,20 @@ const webappSeed = async () => {
     const User = mongoose.model('users', schema)
     const PersonalInfo = mongoose.model('personal_infos', schema)
     const Questionnaire = mongoose.model('questionnaires', schema)
-    const Image = mongoose.model('images', schema)
+    // const Image = mongoose.model('images', schema)
     const Report = mongoose.model('reports', schema)
-    const Project = mongoose.model('projects', schema)
-    const Gradcam = mongoose.model('gradcams', schema)
-    const PredClass = mongoose.model('pred_classes', schema)
+    // const Project = mongoose.model('projects', schema)
+    // const Gradcam = mongoose.model('gradcams', schema)
+    // const PredClass = mongoose.model('pred_classes', schema)
 
     await User.collection.drop()
     await PersonalInfo.collection.drop()
     await Questionnaire.collection.drop()
-    await Image.collection.drop()
+    // await Image.collection.drop()
     await Report.collection.drop()
-    await Project.collection.drop()
-    await Gradcam.collection.drop()
-    await PredClass.collection.drop()
+    // await Project.collection.drop()
+    // await Gradcam.collection.drop()
+    // await PredClass.collection.drop()
 
     const passwordHash = await bcrypt.hash('12312312', 10);
 

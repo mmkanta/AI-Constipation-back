@@ -3,6 +3,8 @@
     summary: Questionnaire inference
     tags:
       - Inference
+    security:
+      - bearerAuth: []
     requestBody:
       required: true
       content:
@@ -87,6 +89,8 @@
     summary: Image inference
     tags:
       - Inference
+    security:
+      - bearerAuth: []
     requestBody:
       required: true
       content:
