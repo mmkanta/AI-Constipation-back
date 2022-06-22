@@ -185,7 +185,8 @@ const update = async (req, res) => {
                 _id: req.body.id,
                 status: userStatus.ACTIVE,
             },
-            req.body
+            req.body,
+            { new: true }
         );
         if (!user)
             return res
@@ -202,6 +203,7 @@ const update = async (req, res) => {
                 first_name: user.first_name,
                 last_name: user.last_name,
                 role: user.role,
+                email: user.email,
                 status: user.status,
             },
         });

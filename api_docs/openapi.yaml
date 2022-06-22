@@ -62,15 +62,17 @@ paths:
     $ref: "./routes/infer.yaml#/~1questionnaire"
   /infer/image:
     $ref: "./routes/infer.yaml#/~1image"
+  /infer/integrate:
+    $ref: "./routes/infer.yaml#/~1integrate"
 
   # report
-  # /report:
-  #   $ref: "./routes/report.yaml#/~1updatedById"
-  # /report/{rid}:
-  #   $ref: "./routes/report.yaml#/~1"
-  /report/list:
+  /reports:
+    $ref: "./routes/report.yaml#/~1update"
+  /reports/{report_id}:
+    $ref: "./routes/report.yaml#/~1"
+  /reports/list:
     $ref: "./routes/report.yaml#/~1getAllReports"
-  /report/image:
+  /reports/image:
     $ref: "./routes/report.yaml#/~1getImage"
-  # /report/delete/{rid}:
-  #   $ref: "./routes/report.yaml#/~1deleteById"
+  /reports/delete/{report_id}:
+    $ref: "./routes/report.yaml#/~1deleteById"

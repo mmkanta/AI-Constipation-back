@@ -21,7 +21,7 @@ const userRole = {
 const modelTask = {
     QUESTIONNAIRE: "questionnaire",
     IMAGE: "image",
-    INTEGRATED: "integrated"
+    INTEGRATE: "integrate"
 }
 
 module.exports = {

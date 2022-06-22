@@ -18,7 +18,16 @@ const adminVerification = (req, res, next) => {
     next()
 }
 
+// verify if user is clinician
+const clinicianVerification = (req, res, next) => {
+    if (req.user.role !== userRole.CLINICIAN) {
+        return res.status(403).json({ success: false, message: `User must be clinician to access the resource` })
+    }
+    next()
+}
+
 module.exports = {
     userVerification,
     adminVerification,
+    clinicianVerification
 }
