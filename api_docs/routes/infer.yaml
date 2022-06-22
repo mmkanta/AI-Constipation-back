@@ -15,35 +15,35 @@
               questionnaire:
                 type: object
                 properties:
-                  fdisc: 
+                  DistFreq: 
                     type: number
-                  sev3: 
+                  DistSev: 
                     type: number
-                  fdiscxsev3: 
+                  DistSevFreq: 
                     type: number
-                  dur3: 
+                  DistDur: 
                     type: number
-                  fstool: 
+                  FreqStool: 
                     type: number
-                  incomplete: 
+                  Incomplete: 
                     type: number
-                  strain: 
+                  Strain: 
                     type: number
-                  hard: 
+                  Hard: 
                     type: number
-                  block: 
+                  Block: 
                     type: number
-                  digit: 
+                  Digit: 
                     type: number
-                  ppd: 
+                  BloatFreq: 
                     type: number
-                  sev9: 
+                  BloatSev: 
                     type: number
-                  ppdxsev9: 
+                  BloatSevFreq: 
                     type: number
-                  dur9: 
+                  BloatDur: 
                     type: number
-                  scalesev: 
+                  SevScale: 
                     type: number              
               personalInfo:
                 type: object
@@ -57,6 +57,8 @@
                   gender:
                     type: string
                   age: 
+                    type: number
+                  DD_confidence:
                     type: number
     responses:
       200:
@@ -110,6 +112,99 @@
                   gender:
                     type: string
                   age: 
+                    type: number
+                  DD_confidence:
+                    type: number
+              file:
+                type: string
+                format: binary
+    responses:
+      200:
+        description: Success
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/successResponse"
+      400:
+        description: Invalid input
+        content:
+          application/json:
+              schema:
+                $ref: "#/components/badReqResponse"
+      401:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/unauthorizedResponse"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/errorResponse"
+
+/integrate:
+  post:
+    summary: Integrate inference
+    tags:
+      - Inference
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            properties:
+              personalInfo:
+                type: object
+                properties:
+                  hospital:
+                    type: string
+                  hn:
+                    type: string
+                  name:
+                    type: string
+                  gender:
+                    type: string
+                  age: 
+                    type: number
+                  DD_confidence:
+                    type: number
+              questionnaire:
+                type: object
+                properties:
+                  DistFreq: 
+                    type: number
+                  DistSev: 
+                    type: number
+                  DistSevFreq: 
+                    type: number
+                  DistDur: 
+                    type: number
+                  FreqStool: 
+                    type: number
+                  Incomplete: 
+                    type: number
+                  Strain: 
+                    type: number
+                  Hard: 
+                    type: number
+                  Block: 
+                    type: number
+                  Digit: 
+                    type: number
+                  BloatFreq: 
+                    type: number
+                  BloatSev: 
+                    type: number
+                  BloatSevFreq: 
+                    type: number
+                  BloatDur: 
+                    type: number
+                  SevScale: 
                     type: number
               file:
                 type: string

@@ -8,7 +8,8 @@ const schema = new Schema(
         hn: { type: String, required: true },
         name: { type: String, required: true },
         gender: { type: String, required: true },
-        age: { type: Number, required: true }
+        age: { type: Number, required: true },
+        DD_confidence: { type: Number, required: true },
     },
     {
         timestamps: true

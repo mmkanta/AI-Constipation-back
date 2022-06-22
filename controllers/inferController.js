@@ -7,6 +7,7 @@ const FormData = require('form-data');
 const extract = require('extract-zip')
 const dotenv = require('dotenv')
 const { modelStatus, modelTask } = require('../utils/status')
+const { generateShortId } = require('../utils/reusableFunction')
 // let con1 = require('../db/webapp')
 dotenv.config()
 
@@ -15,31 +16,36 @@ const root = path.join(__dirname, "..");
 
 const questionSchema = {
     questionnaire: Joi.object({
-        fdisc: Joi.number().min(0).required(),
-        sev3: Joi.number().min(0).required(),
-        fdiscxsev3: Joi.number().min(0).required(),
-        dur3: Joi.number().min(0).required(),
-        fstool: Joi.number().min(0).required(),
-        incomplete: Joi.number().min(0).required(),
-        strain: Joi.number().min(0).required(),
-        hard: Joi.number().min(0).required(),
-        block: Joi.number().min(0).required(),
-        digit: Joi.number().min(0).required(),
-        ppd: Joi.number().min(0).required(),
-        sev9: Joi.number().min(0).required(),
-        ppdxsev9: Joi.number().min(0).required(),
-        dur9: Joi.number().min(0).required(),
-        scalesev: Joi.number().min(0).required()
+        DistFreq: Joi.number().min(0).max(6).required(),
+        DistSev: Joi.number().min(0).max(3).required(),
+        DistSevFreq: Joi.number().min(0).max(18).required(),
+        DistDur: Joi.number().min(0).max(240).required(),
+        FreqStool: Joi.number().min(0).max(100).required(),
+        Incomplete: Joi.number().min(0).max(1).required(),
+        Strain: Joi.number().min(0).max(1).required(),
+        Hard: Joi.number().min(0).max(1).required(),
+        Block: Joi.number().min(0).max(1).required(),
+        Digit: Joi.number().min(0).max(1).required(),
+        BloatFreq: Joi.number().min(0).max(6).required(),
+        BloatSev: Joi.number().min(0).max(3).required(),
+        BloatSevFreq: Joi.number().min(0).max(18).required(),
+        BloatDur: Joi.number().min(0).max(240).required(),
+        SevScale: Joi.number().min(0).max(10).required()
     }).required()
 };
 
 const personlInfoSchema = {
     personalInfo: Joi.object({
-        hospital: Joi.string().max(50).required(),
+        hospital: Joi.string().valid(
+            "Prince of Songkla University",
+            "Thammasat University",
+            "Chulalongkorn University").required(),
         hn: Joi.string().max(15).required(),
         name: Joi.string().max(50).required(),
-        gender: Joi.string().max(50).required(),
+        gender: Joi.string().max(15)
+            .valid("F", "M").required(),
         age: Joi.number().min(0).required(),
+        DD_confidence: Joi.number().min(0).max(100).required()
     }).required()
 }
 
@@ -50,21 +56,21 @@ const questionnaireInfer = async (req, res) => {
     // validate input
     const validatedQuestion = questionValidator.validate({
         questionnaire: {
-            fdisc: req.body.questionnaire.fdisc,
-            sev3: req.body.questionnaire.sev3,
-            fdiscxsev3: req.body.questionnaire.fdiscxsev3,
-            dur3: req.body.questionnaire.dur3,
-            fstool: req.body.questionnaire.fstool,
-            incomplete: req.body.questionnaire.incomplete,
-            strain: req.body.questionnaire.strain,
-            hard: req.body.questionnaire.hard,
-            block: req.body.questionnaire.block,
-            digit: req.body.questionnaire.digit,
-            ppd: req.body.questionnaire.ppd,
-            sev9: req.body.questionnaire.sev9,
-            ppdxsev9: req.body.questionnaire.ppdxsev9,
-            dur9: req.body.questionnaire.dur9,
-            scalesev: req.body.questionnaire.scalesev
+            DistFreq: req.body.questionnaire.DistFreq,
+            DistSev: req.body.questionnaire.DistSev,
+            DistSevFreq: req.body.questionnaire.DistSevFreq,
+            DistDur: req.body.questionnaire.DistDur,
+            FreqStool: req.body.questionnaire.FreqStool,
+            Incomplete: req.body.questionnaire.Incomplete,
+            Strain: req.body.questionnaire.Strain,
+            Hard: req.body.questionnaire.Hard,
+            Block: req.body.questionnaire.Block,
+            Digit: req.body.questionnaire.Digit,
+            BloatFreq: req.body.questionnaire.BloatFreq,
+            BloatSev: req.body.questionnaire.BloatSev,
+            BloatSevFreq: req.body.questionnaire.BloatSevFreq,
+            BloatDur: req.body.questionnaire.BloatDur,
+            SevScale: req.body.questionnaire.SevScale
         }
     })
     const validatedInfo = personalInfoValidator.validate({
@@ -123,7 +129,12 @@ const questionnaireInfer = async (req, res) => {
             // const errMsg = e.message.includes('status code 500')? `Model Error: ${e.response?.data.toString()}`: e.message
         })
 
-        return res.status(200).json({ success: true, message: `Start inference` })
+        return res.status(200).json({
+            success: true, message: `Start inference`, data: {
+                report_index: generateShortId(report.id),
+                report_id: report.id
+            }
+        })
 
     } catch (e) {
         return res.status(500).json({ success: false, message: 'Internal server error', error: e.message });
@@ -131,14 +142,13 @@ const questionnaireInfer = async (req, res) => {
 }
 
 const imageInfer = async (req, res) => {
-    const oldPath = path.join(root, "/resources/uploads/", req.file.filename)
     if (req.file === undefined) {
-        if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
         return res.status(400).json({
             success: false,
             message: `Invalid input: Image file must be .png or .jpeg`
         })
     }
+    const oldPath = path.join(root, "/resources/uploads/", req.file.filename)
 
     try {
         req.body.personalInfo = JSON.parse(req.body.personalInfo)
@@ -184,7 +194,7 @@ const imageInfer = async (req, res) => {
             created_by: req.user._id,
             updated_by: null,
             gradcam_path: null,
-            original_path: oldPath,
+            original_path: `resources/uploads/${req.file.filename}`,
         })
     } catch (e) {
         if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
@@ -211,7 +221,6 @@ const imageInfer = async (req, res) => {
             await fs.promises.rename(oldPath, newPath)
 
             fs.writeFileSync(path.join(reportDir, 'result.zip'), res.data);
-            console.log(path.join(reportDir, 'result.zip'), reportDir)
 
             // extract zip file to result directory (overlay files + prediction file)
             await extract(path.join(reportDir, 'result.zip'), { dir: reportDir })
@@ -226,9 +235,10 @@ const imageInfer = async (req, res) => {
             await webModel.Report.findByIdAndUpdate(report._id, {
                 status: modelStatus.AI_ANNOTATED,
                 DD_probability: modelResult.DD_probability,
-                gradcam_path: path.join(root, "/resources/reports/", todayYear, todayMonth, String(report._id), "gradcam.png"),
-                original_path: newPath
+                gradcam_path: `resources/reports/${todayYear}/${todayMonth}/${String(report._id)}/gradcam.png`,
+                original_path: `resources/reports/${todayYear}/${todayMonth}/${String(report._id)}/${req.file.originalname}`
             })
+            console.log('Finish Inference')
 
         }).catch(async e => {
             await webModel.Report.findByIdAndUpdate(report._id, { status: modelStatus.CANCELED })
@@ -241,7 +251,169 @@ const imageInfer = async (req, res) => {
             console.log(e)
         })
 
-        return res.status(200).json({ success: true, message: `Start inference` })
+        return res.status(200).json({
+            success: true, message: `Start inference`, data: {
+                report_index: generateShortId(report.id),
+                report_id: report.id
+            }
+        })
+    } catch (e) {
+        console.log(e)
+        await webModel.Report.findByIdAndUpdate(report._id, { status: modelStatus.CANCELED })
+        if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
+        if (fs.existsSync(reportDir)) {
+            fs.rm(reportDir, { recursive: true, force: true }, (err) => {
+                if (err) console.log(err)
+            });
+        }
+        return res.status(500).json({ success: false, message: 'Internal server error', error: e.message });
+    }
+}
+
+const integrateInfer = async (req, res) => {
+    if (req.file === undefined) {
+        return res.status(400).json({
+            success: false,
+            message: `Invalid input: Image file must be .png or .jpeg`
+        })
+    }
+    const oldPath = path.join(root, "/resources/uploads/", req.file.filename)
+
+    try {
+        req.body.personalInfo = JSON.parse(req.body.personalInfo)
+        req.body.questionnaire = JSON.parse(req.body.questionnaire)
+    } catch (e) {
+        if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
+        return res.status(400).json({
+            success: false,
+            message: `Invalid input: Personal Info/Questionnaire must be in JSON format`
+        })
+    }
+
+    // validate input
+    const validatedQuestion = questionValidator.validate({
+        questionnaire: {
+            DistFreq: req.body.questionnaire.DistFreq,
+            DistSev: req.body.questionnaire.DistSev,
+            DistSevFreq: req.body.questionnaire.DistSevFreq,
+            DistDur: req.body.questionnaire.DistDur,
+            FreqStool: req.body.questionnaire.FreqStool,
+            Incomplete: req.body.questionnaire.Incomplete,
+            Strain: req.body.questionnaire.Strain,
+            Hard: req.body.questionnaire.Hard,
+            Block: req.body.questionnaire.Block,
+            Digit: req.body.questionnaire.Digit,
+            BloatFreq: req.body.questionnaire.BloatFreq,
+            BloatSev: req.body.questionnaire.BloatSev,
+            BloatSevFreq: req.body.questionnaire.BloatSevFreq,
+            BloatDur: req.body.questionnaire.BloatDur,
+            SevScale: req.body.questionnaire.SevScale
+        }
+    })
+    const validatedInfo = personalInfoValidator.validate({
+        personalInfo: req.body.personalInfo,
+    })
+    if (validatedQuestion.error || validatedInfo.error) {
+        if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
+        return res.status(400).json({
+            success: false,
+            message: `Invalid input: ${(validatedInfo.error) ? validatedInfo.error.message : validatedQuestion.error.message}`
+        })
+    }
+    req.body.questionnaire = validatedQuestion.value.questionnaire
+    req.body.personalInfo = validatedInfo.value.personalInfo
+
+    let questionArr = []
+    for (const [key, value] of Object.entries(req.body.questionnaire)) questionArr.push(value)
+
+    let personalInfo = {}
+    let report = {}
+    let questionnaire = {}
+    try {
+        personalInfo = await webModel.PersonalInfo.create(req.body.personalInfo)
+        questionnaire = await webModel.Questionnaire.create(req.body.questionnaire)
+        report = await webModel.Report.create({
+            question_id: questionnaire._id,
+            personal_info_id: personalInfo._id,
+            task: modelTask.INTEGRATE,
+            status: modelStatus.IN_PROGRESS,
+            DD_probability: null,
+            label: null,
+            final_diag: null,
+            ctt_result: null,
+            anorectal_structural_abnormality: null,
+            IBS: null,
+            cormorbidity: null,
+            surgical_history: null,
+            surgical_history_note: null,
+            comments: null,
+            created_by: req.user._id,
+            updated_by: null,
+            gradcam_path: null,
+            original_path: `resources/uploads/${req.file.filename}`,
+        })
+    } catch (e) {
+        if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
+        return res.status(500).json({ success: false, message: 'Internal server error', error: e.message });
+    }
+
+    const todayYear = String((new Date()).getUTCFullYear())
+    const todayMonth = String((new Date()).getUTCMonth() + 1)
+    // define directory path
+    const reportDir = path.join(root, "/resources/reports/", todayYear, todayMonth, String(report._id))
+    if (!fs.existsSync(reportDir)) fs.mkdirSync(reportDir, { recursive: true });
+
+    try {
+        const data = new FormData()
+        data.append('file', fs.createReadStream(oldPath))
+        data.append('questionnaire', JSON.stringify(questionArr))
+
+        axios.post(pyURL + "/integrate", data, {
+            headers: {
+                'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
+            },
+            responseType: 'arraybuffer'
+        }).then(async res => {
+            const newPath = path.join(reportDir, req.file.originalname)
+            await fs.promises.rename(oldPath, newPath)
+
+            fs.writeFileSync(path.join(reportDir, 'result.zip'), res.data);
+
+            // extract zip file to result directory (overlay files + prediction file)
+            await extract(path.join(reportDir, 'result.zip'), { dir: reportDir })
+
+            let modelResult = JSON.parse(fs.readFileSync(path.join(reportDir, '/prediction.txt')));
+            // delete zip file
+            await fs.promises.unlink(path.join(reportDir, '/result.zip'))
+
+            // delete probability prediction file
+            await fs.promises.unlink(path.join(reportDir, '/prediction.txt'))
+
+            await webModel.Report.findByIdAndUpdate(report._id, {
+                status: modelStatus.AI_ANNOTATED,
+                DD_probability: modelResult.DD_probability,
+                gradcam_path: `resources/reports/${todayYear}/${todayMonth}/${String(report._id)}/gradcam.png`,
+                original_path: `resources/reports/${todayYear}/${todayMonth}/${String(report._id)}/${req.file.originalname}`
+            })
+            console.log('Finish Inference')
+
+        }).catch(async e => {
+            await webModel.Report.findByIdAndUpdate(report._id, { status: modelStatus.CANCELED })
+            if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
+            if (fs.existsSync(reportDir)) {
+                fs.rm(reportDir, { recursive: true, force: true }, (err) => {
+                    if (err) console.log(err)
+                });
+            }
+            console.log(e)
+        })
+
+        return res.status(200).json({
+            success: true, message: `Start inference`, data: {
+                report_index: generateShortId(report.id),
+                report_id: report.id
+            }
+        })
     } catch (e) {
         console.log(e)
         await webModel.Report.findByIdAndUpdate(report._id, { status: modelStatus.CANCELED })
@@ -257,5 +429,6 @@ const imageInfer = async (req, res) => {
 
 module.exports = {
     questionnaireInfer,
-    imageInfer
+    imageInfer,
+    integrateInfer
 }
