@@ -21,7 +21,7 @@ const schema = new Schema(
         ctt_result: { type: String },
         anorectal_structural_abnormality: { type: String },
         IBS: { type: Boolean },
-        cormorbidity: { type: String },
+        comorbidity: { type: String },
         surgical_history: { type: Boolean },
         surgical_history_note: { type: String },
         comments: { type: String },

@@ -6,7 +6,7 @@ const axios = require('axios')
 const FormData = require('form-data');
 const extract = require('extract-zip')
 const dotenv = require('dotenv')
-const { modelStatus, modelTask } = require('../utils/status')
+const { modelStatus, modelTask, hospitalList } = require('../utils/status')
 const { generateShortId } = require('../utils/reusableFunction')
 // let con1 = require('../db/webapp')
 dotenv.config()
@@ -37,9 +37,9 @@ const questionSchema = {
 const personlInfoSchema = {
     personalInfo: Joi.object({
         hospital: Joi.string().valid(
-            "Prince of Songkla University",
-            "Thammasat University",
-            "Chulalongkorn University").required(),
+            hospitalList.CU,
+            hospitalList.PSU,
+            hospitalList.TU).required(),
         hn: Joi.string().max(15).required(),
         name: Joi.string().max(50).required(),
         gender: Joi.string().max(15)

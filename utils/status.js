@@ -24,9 +24,16 @@ const modelTask = {
     INTEGRATE: "integrate"
 }
 
+const hospitalList = {
+    PSU: "Prince of Songkla University",
+    TU: "Thammasat University",
+    CU: "Chulalongkorn University"
+}
+
 module.exports = {
     modelStatus,
     userStatus,
     userRole,
-    modelTask
+    modelTask,
+    hospitalList
 }

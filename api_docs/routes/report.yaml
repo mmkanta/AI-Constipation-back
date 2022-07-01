@@ -126,7 +126,7 @@
                 type: string
               IBS: 
                 type: boolean
-              cormorbidity: 
+              comorbidity: 
                 type: string
               surgical_history: 
                 type: boolean

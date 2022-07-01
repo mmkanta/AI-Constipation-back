@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const Joi = require("joi");
 const webModel = require("../schema");
-const { userStatus, userRole } = require("../utils/status");
+const { userStatus, userRole, hospitalList } = require("../utils/status");
 
 // create data validator for input
 const schema = {
@@ -13,6 +13,10 @@ const schema = {
     role: Joi.string()
         .valid(userRole.ADMIN, userRole.GENERAL, userRole.CLINICIAN)
         .required(),
+    hospital: Joi.string().valid(
+        hospitalList.CU,
+        hospitalList.PSU,
+        hospitalList.TU).required(),
     email: Joi.string().required().email(),
 };
 
@@ -23,6 +27,10 @@ const updateSchema = {
     last_name: Joi.string().max(32),
     role: Joi.string()
         .valid(userRole.ADMIN, userRole.GENERAL, userRole.CLINICIAN),
+    hospital: Joi.string().valid(
+        hospitalList.CU,
+        hospitalList.PSU,
+        hospitalList.TU).required(),
     email: Joi.string().email(),
 };
 
@@ -44,6 +52,7 @@ const create = async (req, res) => {
             });
     }
     try {
+        req.body = validatedResult.value
         // hash password
         const passwordHash = await bcrypt.hash(req.body.password, salt);
 
@@ -100,6 +109,7 @@ const getAll = async (req, res) => {
                 "last_name",
                 "role",
                 "email",
+                "hospital"
             ]
         );
 
@@ -133,15 +143,16 @@ const getById = async (req, res) => {
             "last_name",
             "role",
             "email",
+            "hospital"
         ]);
 
         if (!user)
             return res
-            .status(400)
-            .json({
-                success: true,
-                message: "User not found"
-            });
+                .status(400)
+                .json({
+                    success: true,
+                    message: "User not found"
+                });
         return res
             .status(200)
             .json({
@@ -171,6 +182,8 @@ const update = async (req, res) => {
                 message: `Invalid input: ${validatedResult.error.message}`,
             });
     }
+    req.body = validatedResult.value
+
     try {
         // hash password
         if (req.body.password) {
@@ -205,6 +218,7 @@ const update = async (req, res) => {
                 role: user.role,
                 email: user.email,
                 status: user.status,
+                hospital: user.hospital
             },
         });
     } catch (e) {

@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
-const { modelStatus, userStatus, userRole } = require('../../utils/status');
+const { modelStatus, userStatus, userRole, hospitalList } = require('../../utils/status');
 const mongoose = require('../aiweb')
 const mg = require("mongoose");
 const schema = new mg.Schema();
@@ -39,6 +39,7 @@ const webappSeed = async () => {
             role: userRole.CLINICIAN,
             token: [],
             status: userStatus.ACTIVE,
+            hospital: hospitalList.CU,
             createdAt: new Date('05/13/2022'),
             updatedAt: new Date('05/14/2022')
         },
@@ -51,6 +52,7 @@ const webappSeed = async () => {
             role: userRole.GENERAL,
             token: [],
             status: userStatus.ACTIVE,
+            hospital: hospitalList.CU,
             createdAt: new Date('05/13/2022'),
             updatedAt: new Date('05/16/2022')
         },
@@ -63,6 +65,7 @@ const webappSeed = async () => {
             role: userRole.ADMIN,
             token: [],
             status: userStatus.ACTIVE,
+            hospital: hospitalList.CU,
             createdAt: new Date('05/13/2022'),
             updatedAt: new Date('05/16/2022')
         },

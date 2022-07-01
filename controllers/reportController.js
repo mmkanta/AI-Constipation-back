@@ -10,13 +10,13 @@ const root = path.join(__dirname, "..");
 const updateSchema = {
     report_id: Joi.string().required(),
     // user_id: Joi.string().required(),
-    label: Joi.string().valid("DD", "non-DD"),
-    final_diag: Joi.array().items(Joi.string().valid("symptoms", "manometry", "BET", "defecography", "CTT")).max(5),
-    ctt_result: Joi.string().valid("delayed", "normal", "not done"),
-    anorectal_structural_abnormality: Joi.string().valid("no", "rectocele", "intussusception", "not assess"),
-    IBS: Joi.boolean(),
-    cormorbidity: Joi.string().max(100),
-    surgical_history: Joi.boolean(),
+    label: Joi.string().valid("DD", "non-DD").required(),
+    final_diag: Joi.array().items(Joi.string().valid("symptoms", "manometry", "BET", "defecography", "CTT")).max(5).required(),
+    ctt_result: Joi.string().valid("delayed", "normal", "not done").required(),
+    anorectal_structural_abnormality: Joi.string().valid("no", "rectocele", "intussusception", "not assess").required(),
+    IBS: Joi.boolean().required(),
+    comorbidity: Joi.string().max(100).required(),
+    surgical_history: Joi.boolean().required(),
     surgical_history_note: Joi.string().max(50),
     comments: Joi.string().max(100),
 };
@@ -135,8 +135,15 @@ const update = async (req, res) => {
             message: `Invalid input: ${validatedResult.error.message}`,
         });
     }
+    req.body = validatedResult.value
     req.body.updated_by = req.user._id
     req.body.status = modelStatus.HUMAN_ANNOTATED
+
+    if (req.body.surgical_history && !req.body.surgical_history_note)
+        return res.status(400).json({
+            success: false,
+            message: `Invalid input: "surgical_history_note" is required`,
+        });
     req.body.surgical_history_note = req.body.surgical_history ? req.body.surgical_history_note : null
 
     try {
@@ -174,7 +181,7 @@ const deleteById = async (req, res) => {
             req.params.report_id,
             ["question_id", "personal_info_id", "original_path", "gradcam_path"]
         )
-        
+
         if (report.original_path) {
             let resultDir = report.original_path.split('/')
             resultDir.pop()
