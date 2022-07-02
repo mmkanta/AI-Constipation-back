@@ -69,6 +69,58 @@ const webappSeed = async () => {
             createdAt: new Date('05/13/2022'),
             updatedAt: new Date('05/16/2022')
         },
+        {
+            username: 'user1',
+            password: passwordHash,
+            email: 'user1@gmail.com',
+            first_name: 'User1',
+            last_name: 'User1',
+            role: userRole.CLINICIAN,
+            token: [],
+            status: userStatus.ACTIVE,
+            hospital: hospitalList.PSU,
+            createdAt: new Date('05/14/2022'),
+            updatedAt: new Date('05/14/2022')
+        },
+        {
+            username: 'user2',
+            password: passwordHash,
+            email: 'user2@gmail.com',
+            first_name: 'User2',
+            last_name: 'User2',
+            role: userRole.CLINICIAN,
+            token: [],
+            status: userStatus.ACTIVE,
+            hospital: hospitalList.CU,
+            createdAt: new Date('05/14/2022'),
+            updatedAt: new Date('05/14/2022')
+        },
+        {
+            username: 'user3',
+            password: passwordHash,
+            email: 'user3@gmail.com',
+            first_name: 'User3',
+            last_name: 'User3',
+            role: userRole.CLINICIAN,
+            token: [],
+            status: userStatus.ACTIVE,
+            hospital: hospitalList.TU,
+            createdAt: new Date('05/14/2022'),
+            updatedAt: new Date('05/14/2022')
+        },
+        {
+            username: 'user4',
+            password: passwordHash,
+            email: 'user4@gmail.com',
+            first_name: 'User4',
+            last_name: 'User4',
+            role: userRole.CLINICIAN,
+            token: [],
+            status: userStatus.ACTIVE,
+            hospital: hospitalList.TU,
+            createdAt: new Date('05/14/2022'),
+            updatedAt: new Date('05/14/2022')
+        },
     ])
 }
 

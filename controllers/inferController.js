@@ -8,6 +8,7 @@ const extract = require('extract-zip')
 const dotenv = require('dotenv')
 const { modelStatus, modelTask, hospitalList } = require('../utils/status')
 const { generateShortId } = require('../utils/reusableFunction')
+const XLSX = require('xlsx')
 // let con1 = require('../db/webapp')
 dotenv.config()
 
@@ -104,8 +105,8 @@ const questionnaireInfer = async (req, res) => {
             anorectal_structural_abnormality: null,
             IBS: null,
             cormorbidity: null,
-            surgical_history: null,
-            surgical_history_note: null,
+            surgery: null,
+            surgery_note: null,
             comments: null,
             created_by: req.user._id,
             updated_by: null,
@@ -188,8 +189,8 @@ const imageInfer = async (req, res) => {
             anorectal_structural_abnormality: null,
             IBS: null,
             cormorbidity: null,
-            surgical_history: null,
-            surgical_history_note: null,
+            surgery: null,
+            surgery_note: null,
             comments: null,
             created_by: req.user._id,
             updated_by: null,
@@ -344,8 +345,8 @@ const integrateInfer = async (req, res) => {
             anorectal_structural_abnormality: null,
             IBS: null,
             cormorbidity: null,
-            surgical_history: null,
-            surgical_history_note: null,
+            surgery: null,
+            surgery_note: null,
             comments: null,
             created_by: req.user._id,
             updated_by: null,
@@ -427,8 +428,44 @@ const integrateInfer = async (req, res) => {
     }
 }
 
+// generate template
+const generateTemplate = async (req, res) => {
+    try {
+        const ws = XLSX.utils.json_to_sheet([
+            { name: "DistFreq" },
+            { name: "DistSev" },
+            { name: "DistSevFreq" },
+            { name: "DistDur" },
+            { name: "FreqStool" },
+            { name: "Incomplete" },
+            { name: "Strain" },
+            { name: "Hard" },
+            { name: "Block" },
+            { name: "Digit" },
+            { name: "BloatFreq" },
+            { name: "BloatSev" },
+            { name: "BloatSevFreq" },
+            { name: "BloatDur" },
+            { name: "SevScale" }
+        ], { header: ["name", "value"] })
+        const wb = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(wb, ws);
+        const wbbuf = XLSX.write(wb, { type: 'buffer' });
+
+        res.writeHead(200, [
+            ['Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+        ]);
+        return res.end(wbbuf)
+    } catch (e) {
+        return res.status(500).json({ success: false, message: `Internal server error` })
+    }
+
+}
+
 module.exports = {
     questionnaireInfer,
     imageInfer,
-    integrateInfer
+    integrateInfer,
+    generateTemplate
 }

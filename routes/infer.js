@@ -14,4 +14,7 @@ router.post('/integrate', tokenValidation, upload.single('file'), inferControlle
 // image inference
 router.post('/questionnaire', tokenValidation, inferController.questionnaireInfer);
 
+// generate template
+router.get('/template', inferController.generateTemplate)
+
 module.exports = router;
