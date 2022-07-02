@@ -10,14 +10,16 @@ const root = path.join(__dirname, "..");
 const updateSchema = {
     report_id: Joi.string().required(),
     // user_id: Joi.string().required(),
-    label: Joi.string().valid("DD", "non-DD"),
-    final_diag: Joi.array().items(Joi.string().valid("symptoms", "manometry", "BET", "defecography", "CTT")).max(5),
-    ctt_result: Joi.string().valid("delayed", "normal", "not done"),
-    anorectal_structural_abnormality: Joi.string().valid("no", "rectocele", "intussusception", "not assess"),
-    IBS: Joi.boolean(),
-    cormorbidity: Joi.string().max(100),
-    surgical_history: Joi.boolean(),
-    surgical_history_note: Joi.string().max(50),
+    label: Joi.string().valid("DD", "non-DD").required(),
+    final_diag: Joi.array().items(Joi.string().valid("symptoms", "manometry", "BET", "defecography", "CTT")).max(5).required(),
+    ctt_result: Joi.string().valid("delayed", "normal", "not done").required(),
+    anorectal_structural_abnormality: Joi.string().valid("no", "rectocele", "intussusception", "not assess", "other").required(),
+    anorectal_structural_abnormality_note: Joi.string().max(100).required(),
+    IBS: Joi.boolean().required(),
+    comorbidity: Joi.string().valid("stroke", "parkinson", "cipo", "other").required(),
+    comorbidity_note: Joi.string().max(100).required(),
+    surgery: Joi.boolean().required(),
+    surgery_note: Joi.string().max(50),
     comments: Joi.string().max(100),
 };
 
@@ -53,7 +55,8 @@ const viewResult = async (req, res) => {
                 "personal_info_id",
                 "created_by",
                 "label",
-                "createdAt",
+                // "createdAt",
+                "updatedAt",
                 "_id",
                 "DD_probability"
             ])
@@ -73,7 +76,7 @@ const viewResult = async (req, res) => {
                 label: report.label,
                 prediction,
                 evaluation: report.label == prediction ? true : false,
-                date: report.createdAt,
+                date: report.updatedAt,
                 clinician: report.created_by.username,
                 hospital: report.personal_info_id.hospital,
                 DD_confidence: report.personal_info_id.DD_confidence
@@ -135,9 +138,16 @@ const update = async (req, res) => {
             message: `Invalid input: ${validatedResult.error.message}`,
         });
     }
+    req.body = validatedResult.value
     req.body.updated_by = req.user._id
     req.body.status = modelStatus.HUMAN_ANNOTATED
-    req.body.surgical_history_note = req.body.surgical_history ? req.body.surgical_history_note : null
+
+    if (req.body.surgery && !req.body.surgery_note)
+        return res.status(400).json({
+            success: false,
+            message: `Invalid input: "surgery_note" is required`,
+        });
+    req.body.surgery_note = req.body.surgery ? req.body.surgery_note : null
 
     try {
         const report = await webModel.Report.findOneAndUpdate(
@@ -174,7 +184,7 @@ const deleteById = async (req, res) => {
             req.params.report_id,
             ["question_id", "personal_info_id", "original_path", "gradcam_path"]
         )
-        
+
         if (report.original_path) {
             let resultDir = report.original_path.split('/')
             resultDir.pop()

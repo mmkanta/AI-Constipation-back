@@ -64,6 +64,8 @@ paths:
     $ref: "./routes/infer.yaml#/~1image"
   /infer/integrate:
     $ref: "./routes/infer.yaml#/~1integrate"
+  /infer/template:
+    $ref: "./routes/infer.yaml#/~1getTemplate"
 
   # report
   /reports:

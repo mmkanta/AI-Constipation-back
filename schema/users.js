@@ -12,7 +12,8 @@ const schema = new Schema(
         last_name: { type: String, required: true },
         role: { type: String, required: true },
         token: { type: [String], required: true },
-        status: { type: String }
+        status: { type: String, required: true },
+        hospital: { type: String, required: true },
     },
     {
         timestamps: true

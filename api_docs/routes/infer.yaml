@@ -15,36 +15,36 @@
               questionnaire:
                 type: object
                 properties:
-                  DistFreq: 
+                  DistFreq:
                     type: number
-                  DistSev: 
+                  DistSev:
                     type: number
-                  DistSevFreq: 
+                  DistSevFreq:
                     type: number
-                  DistDur: 
+                  DistDur:
                     type: number
-                  FreqStool: 
+                  FreqStool:
                     type: number
-                  Incomplete: 
+                  Incomplete:
                     type: number
-                  Strain: 
+                  Strain:
                     type: number
-                  Hard: 
+                  Hard:
                     type: number
-                  Block: 
+                  Block:
                     type: number
-                  Digit: 
+                  Digit:
                     type: number
-                  BloatFreq: 
+                  BloatFreq:
                     type: number
-                  BloatSev: 
+                  BloatSev:
                     type: number
-                  BloatSevFreq: 
+                  BloatSevFreq:
                     type: number
-                  BloatDur: 
+                  BloatDur:
                     type: number
-                  SevScale: 
-                    type: number              
+                  SevScale:
+                    type: number
               personalInfo:
                 type: object
                 properties:
@@ -56,7 +56,7 @@
                     type: string
                   gender:
                     type: string
-                  age: 
+                  age:
                     type: number
                   DD_confidence:
                     type: number
@@ -71,8 +71,8 @@
         description: Invalid input
         content:
           application/json:
-              schema:
-                $ref: "#/components/badReqResponse"
+            schema:
+              $ref: "#/components/badReqResponse"
       401:
         description: Unauthorized
         content:
@@ -111,7 +111,7 @@
                     type: string
                   gender:
                     type: string
-                  age: 
+                  age:
                     type: number
                   DD_confidence:
                     type: number
@@ -129,8 +129,8 @@
         description: Invalid input
         content:
           application/json:
-              schema:
-                $ref: "#/components/badReqResponse"
+            schema:
+              $ref: "#/components/badReqResponse"
       401:
         description: Unauthorized
         content:
@@ -169,42 +169,42 @@
                     type: string
                   gender:
                     type: string
-                  age: 
+                  age:
                     type: number
                   DD_confidence:
                     type: number
               questionnaire:
                 type: object
                 properties:
-                  DistFreq: 
+                  DistFreq:
                     type: number
-                  DistSev: 
+                  DistSev:
                     type: number
-                  DistSevFreq: 
+                  DistSevFreq:
                     type: number
-                  DistDur: 
+                  DistDur:
                     type: number
-                  FreqStool: 
+                  FreqStool:
                     type: number
-                  Incomplete: 
+                  Incomplete:
                     type: number
-                  Strain: 
+                  Strain:
                     type: number
-                  Hard: 
+                  Hard:
                     type: number
-                  Block: 
+                  Block:
                     type: number
-                  Digit: 
+                  Digit:
                     type: number
-                  BloatFreq: 
+                  BloatFreq:
                     type: number
-                  BloatSev: 
+                  BloatSev:
                     type: number
-                  BloatSevFreq: 
+                  BloatSevFreq:
                     type: number
-                  BloatDur: 
+                  BloatDur:
                     type: number
-                  SevScale: 
+                  SevScale:
                     type: number
               file:
                 type: string
@@ -220,14 +220,41 @@
         description: Invalid input
         content:
           application/json:
-              schema:
-                $ref: "#/components/badReqResponse"
+            schema:
+              $ref: "#/components/badReqResponse"
       401:
         description: Unauthorized
         content:
           application/json:
             schema:
               $ref: "#/components/unauthorizedResponse"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/errorResponse"
+
+/getTemplate:
+  get:
+    summary: Get .xlsx questionnaire template
+    tags:
+      - Inference
+    # security:
+    #   - bearerAuth: []
+    responses:
+      200:
+        description: Success
+        content:
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: file
+      # 401:
+      #   description: Unauthorized
+      #   content:
+      #     application/json:
+      #       schema:
+      #         $ref: "#/components/unauthorizedResponse"
       500:
         description: Internal server error
         content:
