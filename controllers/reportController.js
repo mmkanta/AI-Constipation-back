@@ -58,7 +58,8 @@ const viewResult = async (req, res) => {
                 // "createdAt",
                 "updatedAt",
                 "_id",
-                "DD_probability"
+                "DD_probability",
+                "task"
             ])
             .populate("personal_info_id", ["hn", "name", "DD_confidence", "hospital"])
             .populate("created_by", ["username"])
@@ -75,11 +76,12 @@ const viewResult = async (req, res) => {
                 name: report.personal_info_id.name,
                 label: report.label,
                 prediction,
-                evaluation: report.label == prediction ? true : false,
+                // evaluation: report.label == prediction ? true : false,
                 date: report.updatedAt,
                 clinician: report.created_by.username,
                 hospital: report.personal_info_id.hospital,
-                DD_confidence: report.personal_info_id.DD_confidence
+                DD_confidence: report.personal_info_id.DD_confidence,
+                model: report.task
             }
         })
 
@@ -98,8 +100,8 @@ const getById = async (req, res) => {
         let report = await webModel.Report.findById(req.params.report_id)
             .populate("personal_info_id")
             .populate("question_id")
-            .populate("created_by", ["username", "first_name", "last_name"])
-            .populate("updated_by", ["username", "first_name", "last_name"])
+            .populate("created_by", ["username", "first_name", "last_name", "hospital"])
+            .populate("updated_by", ["username", "first_name", "last_name", "hospital"])
 
         if (!report)
             return res.status(400).json({ success: false, message: 'Report not found' })
@@ -147,7 +149,20 @@ const update = async (req, res) => {
             success: false,
             message: `Invalid input: "surgery_note" is required`,
         });
+    if (req.body.anorectal_structural_abnormality=="other" && !req.body.anorectal_structural_abnormality_note)
+        return res.status(400).json({
+            success: false,
+            message: `Invalid input: "anorectal_structural_abnormality_note" is required`,
+        });
+    if (req.body.comorbidity=="other" && !req.body.comorbidity_note)
+        return res.status(400).json({
+            success: false,
+            message: `Invalid input: "comorbidity_note" is required`,
+        });
     req.body.surgery_note = req.body.surgery ? req.body.surgery_note : null
+    req.body.anorectal_structural_abnormality_note = req.body.anorectal_structural_abnormality=="other" ? req.body.anorectal_structural_abnormality_note : null
+    req.body.comorbidity_note = req.body.comorbidity=="other" ? req.body.comorbidity_note : null
+    req.body.comments = req.body.comments ?? null
 
     try {
         const report = await webModel.Report.findOneAndUpdate(
@@ -164,7 +179,7 @@ const update = async (req, res) => {
             { new: true }
         )
 
-        if (!report) return res.status(400).json({ success: false, message: `Cannot update report ${req.body.report_id}` })
+        if (!report) return res.status(400).json({ success: false, message: `Cannot update report ${req.body.report_id} because of invalid report id/status` })
 
         return res.status(200).json({
             success: true, message: 'Update report successfully', data: {
