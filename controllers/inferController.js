@@ -45,7 +45,7 @@ const personlInfoSchema = {
         name: Joi.string().max(50).required(),
         gender: Joi.string().max(15)
             .valid("F", "M").required(),
-        age: Joi.number().min(0).required(),
+        age: Joi.number().min(0).max(200).required(),
         DD_confidence: Joi.number().min(0).max(100).required()
     }).required()
 }
@@ -103,8 +103,10 @@ const questionnaireInfer = async (req, res) => {
             final_diag: null,
             ctt_result: null,
             anorectal_structural_abnormality: null,
+            anorectal_structural_abnormality_note: null,
             IBS: null,
-            cormorbidity: null,
+            comorbidity: null,
+            comorbidity_note: null,
             surgery: null,
             surgery_note: null,
             comments: null,
@@ -187,8 +189,10 @@ const imageInfer = async (req, res) => {
             final_diag: null,
             ctt_result: null,
             anorectal_structural_abnormality: null,
+            anorectal_structural_abnormality_note: null,
             IBS: null,
-            cormorbidity: null,
+            comorbidity: null,
+            comorbidity_note: null,
             surgery: null,
             surgery_note: null,
             comments: null,
@@ -343,8 +347,10 @@ const integrateInfer = async (req, res) => {
             final_diag: null,
             ctt_result: null,
             anorectal_structural_abnormality: null,
+            anorectal_structural_abnormality_note: null,
             IBS: null,
-            cormorbidity: null,
+            comorbidity: null,
+            comorbidity_note: null,
             surgery: null,
             surgery_note: null,
             comments: null,
@@ -434,7 +440,7 @@ const generateTemplate = async (req, res) => {
         const ws = XLSX.utils.json_to_sheet([
             { name: "DistFreq" },
             { name: "DistSev" },
-            { name: "DistSevFreq" },
+            // { name: "DistSevFreq" },
             { name: "DistDur" },
             { name: "FreqStool" },
             { name: "Incomplete" },
@@ -444,7 +450,7 @@ const generateTemplate = async (req, res) => {
             { name: "Digit" },
             { name: "BloatFreq" },
             { name: "BloatSev" },
-            { name: "BloatSevFreq" },
+            // { name: "BloatSevFreq" },
             { name: "BloatDur" },
             { name: "SevScale" }
         ], { header: ["name", "value"] })
