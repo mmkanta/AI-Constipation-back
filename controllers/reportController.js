@@ -16,7 +16,7 @@ const updateSchema = {
     anorectal_structural_abnormality: Joi.string().valid("no", "rectocele", "intussusception", "not assess", "other").required(),
     anorectal_structural_abnormality_note: Joi.string().max(100).required(),
     IBS: Joi.boolean().required(),
-    comorbidity: Joi.string().valid("stroke", "parkinson", "cipo", "other").required(),
+    comorbidity: Joi.string().valid("none", "stroke", "parkinson", "cipo", "other").required(),
     comorbidity_note: Joi.string().max(100).required(),
     surgery: Joi.boolean().required(),
     surgery_note: Joi.string().max(50),
@@ -25,7 +25,7 @@ const updateSchema = {
 
 const updateValidator = Joi.object(updateSchema);
 
-// get image by accession_no (PACS) or by predicted result id + finding's name (overlay image)
+// get image by report id
 const getImage = async (req, res) => {
     try {
         const report = await webModel.Report.findById(req.query.report_id)
@@ -47,6 +47,7 @@ const getImage = async (req, res) => {
     }
 }
 
+// get all reports
 const viewResult = async (req, res) => {
     try {
         let reports = await webModel.Report.find()
@@ -95,6 +96,7 @@ const viewResult = async (req, res) => {
     }
 }
 
+// get report by id
 const getById = async (req, res) => {
     try {
         let report = await webModel.Report.findById(req.params.report_id)
@@ -109,6 +111,7 @@ const getById = async (req, res) => {
         data = report.toObject()
         data.index = generateShortId(report.id)
 
+        // delete unrelated fields
         if (data.question_id) {
             delete data.question_id.createdAt
             delete data.question_id.updatedAt
@@ -132,7 +135,9 @@ const getById = async (req, res) => {
     }
 }
 
+// update report by id
 const update = async (req, res) => {
+    // validate input
     const validatedResult = updateValidator.validate(req.body);
     if (validatedResult.error) {
         return res.status(400).json({
@@ -144,6 +149,7 @@ const update = async (req, res) => {
     req.body.updated_by = req.user._id
     req.body.status = modelStatus.HUMAN_ANNOTATED
 
+    // check if note field is required
     if (req.body.surgery && !req.body.surgery_note)
         return res.status(400).json({
             success: false,
@@ -165,6 +171,7 @@ const update = async (req, res) => {
     req.body.comments = req.body.comments ?? null
 
     try {
+        // only report with status AI_ANNOTATED and HUMAN_ANNOTATED can be updated
         const report = await webModel.Report.findOneAndUpdate(
             {
                 _id: req.body.report_id,
@@ -192,6 +199,7 @@ const update = async (req, res) => {
     }
 }
 
+// delete report by id
 const deleteById = async (req, res) => {
     if (!req.params.report_id) return res.status(400).json({ success: false, message: `Report ${req.params.report_id} not found` })
     try {
@@ -200,6 +208,7 @@ const deleteById = async (req, res) => {
             ["question_id", "personal_info_id", "original_path", "gradcam_path"]
         )
 
+        // delete report's directory
         if (report.original_path) {
             let resultDir = report.original_path.split('/')
             resultDir.pop()

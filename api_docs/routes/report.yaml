@@ -22,8 +22,8 @@
         description: Invalid input
         content:
           application/json:
-              schema:
-                $ref: "#/components/badReqResponse"
+            schema:
+              $ref: "#/components/badReqResponse"
       500:
         description: Internal server error
         content:
@@ -46,18 +46,18 @@
         name: finding
         schema:
           type: string
-          enum: ['original', 'gradcam']
+          enum: ["original", "gradcam"]
     responses:
       200:
         description: Success
         schema:
-          type: file 
+          type: file
       400:
         description: Invalid input
         content:
           application/json:
-              schema:
-                $ref: "#/components/badReqResponse"
+            schema:
+              $ref: "#/components/badReqResponse"
       500:
         description: Internal server error
         content:
@@ -83,14 +83,14 @@
         description: Invalid input
         content:
           application/json:
-              schema:
-                $ref: "#/components/badReqResponse"
+            schema:
+              $ref: "#/components/badReqResponse"
       401:
         description: Unauthorized
         content:
           application/json:
             schema:
-              $ref: "#/components/unauthorizedResponse"
+              $ref: "#/components/badReqResponse"
       500:
         description: Internal server error
         content:
@@ -112,31 +112,37 @@
           schema:
             type: object
             properties:
-              report_id: 
+              report_id:
                 type: string
-              label: 
-                type: string 
-              final_diag: 
+              label:
+                type: string
+                enum: ["DD", "non-DD"]
+              final_diag:
                 type: array
                 items:
                   type: string
-              ctt_result: 
+                  enum: ["symptoms", "manometry", "BET", "defecography", "CTT"]
+              ctt_result:
                 type: string
-              anorectal_structural_abnormality: 
+                enum: ["delayed", "normal", "not done"]
+              anorectal_structural_abnormality:
                 type: string
-              anorectal_structural_abnormality_note: 
+                enum:
+                  ["no", "rectocele", "intussusception", "not assess", "other"]
+              anorectal_structural_abnormality_note:
                 type: string
-              IBS: 
+              IBS:
                 type: boolean
-              comorbidity: 
+              comorbidity:
                 type: string
-              comorbidity_note: 
+                enum: ["none", "stroke", "parkinson", "cipo", "other"]
+              comorbidity_note:
                 type: string
-              surgery: 
+              surgery:
                 type: boolean
-              surgery_note: 
-                type: string 
-              comments: 
+              surgery_note:
+                type: string
+              comments:
                 type: string
     responses:
       200:
@@ -149,20 +155,20 @@
         description: Invalid input
         content:
           application/json:
-              schema:
-                $ref: "#/components/badReqResponse"
+            schema:
+              $ref: "#/components/badReqResponse"
       401:
         description: Unauthorized
         content:
           application/json:
             schema:
-              $ref: "#/components/unauthorizedResponse"
-      # 403:
-      #     description: Forbidden
-      #     content:
-      #       application/json:
-      #         schema:
-      #           $ref: "#/components/forbiddenResponse"
+              $ref: "#/components/badReqResponse"
+      403:
+        description: Forbidden
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/badReqResponse"
       500:
         description: Internal server error
         content:
@@ -194,14 +200,14 @@
         description: Invalid input
         content:
           application/json:
-              schema:
-                $ref: "#/components/badReqResponse"
+            schema:
+              $ref: "#/components/badReqResponse"
       401:
         description: Unauthorized
         content:
           application/json:
             schema:
-              $ref: "#/components/unauthorizedResponse"
+              $ref: "#/components/badReqResponse"
       500:
         description: Internal server error
         content:
@@ -224,13 +230,7 @@ components:
     properties:
       success:
         type: boolean
-      message:
-        type: string
-  unauthorizedResponse:
-    type: object
-    properties:
-      success:
-        type: boolean
+        example: false
       message:
         type: string
   errorResponse:
@@ -238,6 +238,7 @@ components:
     properties:
       success:
         type: boolean
+        example: false
       message:
         type: string
       error:

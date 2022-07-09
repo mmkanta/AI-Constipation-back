@@ -10,7 +10,7 @@ router.post('/', tokenValidation, verification.adminVerification, userController
 // Update user (admin)
 router.patch('/', tokenValidation, verification.adminVerification, userController.update);
 
-// Get users (admin)
+// Get all users (admin)
 router.get('/', tokenValidation, verification.adminVerification, userController.getAll);
 
 // Get user by id

@@ -27,36 +27,6 @@ paths:
   /users/delete/{user_id}:
     $ref: "./routes/user.yaml#/~1deleteById"
 
-  # # web project
-  # /projects:
-  #   $ref: "./routes/webProject.yaml#/~1"
-  # /projects/manage:
-  #   $ref: "./routes/webProject.yaml#/~1manageUser"
-  # /projects/tasks:
-  #   $ref: "./routes/webProject.yaml#/~1getTasks"
-  # /projects/user/{id}:
-  #   $ref: "./routes/webProject.yaml#/~1getByUserId"
-  # /projects/{project_id}:
-  #   $ref: "./routes/webProject.yaml#/~1getById"
-  # /projects/delete/{project_id}:
-  #   $ref: "./routes/webProject.yaml#/~1deleteById"
-
-  # # vitals
-  # /vitals:
-  #   $ref: "./routes/vitals.yaml#/~1getByQuery"
-  # /vitals/records:
-  #   $ref: "./routes/vitals.yaml#/~1records"
-  # /vitals/projects/{id}/medrec:
-  #   $ref: "./routes/vitals.yaml#/~1getRecordByProjectId"
-  # /vitals/template/{project_id}:
-  #   $ref: "./routes/vitals.yaml#/~1getTemplate"
-  # /vitals/records/updaterow:
-  #   $ref: "./routes/vitals.yaml#/~1updateRecordRow"
-  # /vitals/records/deleterow:
-  #   $ref: "./routes/vitals.yaml#/~1deleteRecordRow"
-  # /vitals/records/deletefile/{id}/medrec:
-  #   $ref: "./routes/vitals.yaml#/~1deleteRecord"
-
   # inference
   /infer/questionnaire:
     $ref: "./routes/infer.yaml#/~1questionnaire"

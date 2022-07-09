@@ -19,10 +19,10 @@ const verifyToken = async (req, res, next) => {
 
     // check if token is not expired
     jwt.verify(token, secret, async (err, user) => {
-        // check if user still login
         const result = await webModel.User.findOne({ token: token });
         if (err || !result) {
             if (err && result) {
+                // if token is invalid, pull the token out of token list
                 await webModel.User.findOneAndUpdate({ token: token }, {
                     $pullAll: { token: [token] }
                 })
@@ -30,8 +30,9 @@ const verifyToken = async (req, res, next) => {
             return res.status(401).json({ success: false, message: 'Token is invalid, please login again' });
         }
 
+        // check if user's status is active
         if (result.status !== userStatus.ACTIVE)
-            return res.status(403).json({ success: false, message: `User have no permission to access the resource` })
+            return res.status(401).json({ success: false, message: `User have no permission to access the resource` })
         req.user = user;
         next();
     })
