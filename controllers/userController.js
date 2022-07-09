@@ -30,7 +30,7 @@ const updateSchema = {
     hospital: Joi.string().valid(
         hospitalList.CU,
         hospitalList.PSU,
-        hospitalList.TU).required(),
+        hospitalList.TU),
     email: Joi.string().email(),
 };
 
@@ -143,7 +143,8 @@ const getById = async (req, res) => {
             "last_name",
             "role",
             "email",
-            "hospital"
+            "hospital",
+            "status"
         ]);
 
         if (!user)
@@ -232,6 +233,7 @@ const update = async (req, res) => {
     }
 };
 
+// update user status to INACTIVE
 const deleteById = async (req, res) => {
     try {
         const user = await webModel.User.findOneAndUpdate(

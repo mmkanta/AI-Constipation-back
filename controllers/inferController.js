@@ -9,7 +9,6 @@ const dotenv = require('dotenv')
 const { modelStatus, modelTask, hospitalList } = require('../utils/status')
 const { generateShortId } = require('../utils/reusableFunction')
 const XLSX = require('xlsx')
-// let con1 = require('../db/webapp')
 dotenv.config()
 
 const pyURL = process.env.PY_SERVER + '/api/infer';
@@ -54,7 +53,7 @@ const questionValidator = Joi.object(questionSchema);
 const personalInfoValidator = Joi.object(personlInfoSchema);
 
 const questionnaireInfer = async (req, res) => {
-    // validate input
+    // validate questionnaire + personalInfo 
     const validatedQuestion = questionValidator.validate({
         questionnaire: {
             DistFreq: req.body.questionnaire.DistFreq,
@@ -86,6 +85,7 @@ const questionnaireInfer = async (req, res) => {
     req.body.questionnaire = validatedQuestion.value.questionnaire
     req.body.personalInfo = validatedInfo.value.personalInfo
 
+    // convert questionnaire object to array of number
     let questionArr = []
     for (const [key, value] of Object.entries(req.body.questionnaire)) questionArr.push(value)
 
@@ -116,9 +116,11 @@ const questionnaireInfer = async (req, res) => {
             original_path: null,
         })
 
+        // python server request
         axios.post(pyURL + "/questionnaire", {
             'questionnaire': questionArr
         }).then(async res => {
+            // update report's status and dd probability
             const dd_prob = res.data.data.DD_probability
             await webModel.Report.findByIdAndUpdate(report._id, {
                 status: modelStatus.AI_ANNOTATED,
@@ -126,7 +128,7 @@ const questionnaireInfer = async (req, res) => {
             })
             console.log('Finish Inference')
         }).catch(async e => {
-            // if AI server send an error, then change result's status to canceled
+            // if python server send an error, then change report's status to canceled
             await webModel.Report.findByIdAndUpdate(report._id, { status: modelStatus.CANCELED })
             console.log(e.message, e.response?.data.toString())
             // const errMsg = e.message.includes('status code 500')? `Model Error: ${e.response?.data.toString()}`: e.message
@@ -145,6 +147,7 @@ const questionnaireInfer = async (req, res) => {
 }
 
 const imageInfer = async (req, res) => {
+    // check if uploaded file is empty
     if (req.file === undefined) {
         return res.status(400).json({
             success: false,
@@ -153,16 +156,16 @@ const imageInfer = async (req, res) => {
     }
     const oldPath = path.join(root, "/resources/uploads/", req.file.filename)
 
+    // validate personalInfo
     try {
         req.body.personalInfo = JSON.parse(req.body.personalInfo)
     } catch (e) {
         if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
         return res.status(400).json({
             success: false,
-            message: `Invalid input: Personal Info must be in JSON format`
+            message: `Invalid input: Personal Info must be in string JSON format`
         })
     }
-
     const validatedInfo = personalInfoValidator.validate({
         personalInfo: req.body.personalInfo,
     })
@@ -199,7 +202,7 @@ const imageInfer = async (req, res) => {
             created_by: req.user._id,
             updated_by: null,
             gradcam_path: null,
-            original_path: `resources/uploads/${req.file.filename}`,
+            original_path: `resources/uploads/${req.file.filename}`, // temporary path
         })
     } catch (e) {
         if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
@@ -208,7 +211,7 @@ const imageInfer = async (req, res) => {
 
     const todayYear = String((new Date()).getUTCFullYear())
     const todayMonth = String((new Date()).getUTCMonth() + 1)
-    // define directory path
+    // define report's directory
     const reportDir = path.join(root, "/resources/reports/", todayYear, todayMonth, String(report._id))
     if (!fs.existsSync(reportDir)) fs.mkdirSync(reportDir, { recursive: true });
 
@@ -216,27 +219,30 @@ const imageInfer = async (req, res) => {
         const data = new FormData()
         data.append('file', fs.createReadStream(oldPath))
 
+        // python server request
         axios.post(pyURL + "/image", data, {
             headers: {
                 'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
             },
             responseType: 'arraybuffer'
         }).then(async res => {
+            // move uploaded file into report's directory and change filename to original name
             const newPath = path.join(reportDir, req.file.originalname)
             await fs.promises.rename(oldPath, newPath)
 
             fs.writeFileSync(path.join(reportDir, 'result.zip'), res.data);
 
-            // extract zip file to result directory (overlay files + prediction file)
+            // extract zip file to report directory (gradcam file + prediction file)
             await extract(path.join(reportDir, 'result.zip'), { dir: reportDir })
 
             let modelResult = JSON.parse(fs.readFileSync(path.join(reportDir, '/prediction.txt')));
             // delete zip file
             await fs.promises.unlink(path.join(reportDir, '/result.zip'))
 
-            // delete probability prediction file
+            // delete prediction file
             await fs.promises.unlink(path.join(reportDir, '/prediction.txt'))
 
+            // update report's status + dd probability + filepath
             await webModel.Report.findByIdAndUpdate(report._id, {
                 status: modelStatus.AI_ANNOTATED,
                 DD_probability: modelResult.DD_probability,
@@ -276,6 +282,7 @@ const imageInfer = async (req, res) => {
 }
 
 const integrateInfer = async (req, res) => {
+    // check if uploaded file is empty
     if (req.file === undefined) {
         return res.status(400).json({
             success: false,
@@ -284,6 +291,7 @@ const integrateInfer = async (req, res) => {
     }
     const oldPath = path.join(root, "/resources/uploads/", req.file.filename)
 
+    // validate questionnaire + personalInfo
     try {
         req.body.personalInfo = JSON.parse(req.body.personalInfo)
         req.body.questionnaire = JSON.parse(req.body.questionnaire)
@@ -291,11 +299,10 @@ const integrateInfer = async (req, res) => {
         if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
         return res.status(400).json({
             success: false,
-            message: `Invalid input: Personal Info/Questionnaire must be in JSON format`
+            message: `Invalid input: Personal Info/Questionnaire must be in string JSON format`
         })
     }
 
-    // validate input
     const validatedQuestion = questionValidator.validate({
         questionnaire: {
             DistFreq: req.body.questionnaire.DistFreq,
@@ -328,6 +335,7 @@ const integrateInfer = async (req, res) => {
     req.body.questionnaire = validatedQuestion.value.questionnaire
     req.body.personalInfo = validatedInfo.value.personalInfo
 
+    // convert questionnaire object to array of number
     let questionArr = []
     for (const [key, value] of Object.entries(req.body.questionnaire)) questionArr.push(value)
 
@@ -357,7 +365,7 @@ const integrateInfer = async (req, res) => {
             created_by: req.user._id,
             updated_by: null,
             gradcam_path: null,
-            original_path: `resources/uploads/${req.file.filename}`,
+            original_path: `resources/uploads/${req.file.filename}`, // temporary path
         })
     } catch (e) {
         if (fs.existsSync(oldPath)) await fs.promises.unlink(oldPath)
@@ -366,7 +374,7 @@ const integrateInfer = async (req, res) => {
 
     const todayYear = String((new Date()).getUTCFullYear())
     const todayMonth = String((new Date()).getUTCMonth() + 1)
-    // define directory path
+    // define report's directory
     const reportDir = path.join(root, "/resources/reports/", todayYear, todayMonth, String(report._id))
     if (!fs.existsSync(reportDir)) fs.mkdirSync(reportDir, { recursive: true });
 
@@ -375,27 +383,30 @@ const integrateInfer = async (req, res) => {
         data.append('file', fs.createReadStream(oldPath))
         data.append('questionnaire', JSON.stringify(questionArr))
 
+        // python server request
         axios.post(pyURL + "/integrate", data, {
             headers: {
                 'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
             },
             responseType: 'arraybuffer'
         }).then(async res => {
+            // move uploaded file into report's directory and change filename to original name
             const newPath = path.join(reportDir, req.file.originalname)
             await fs.promises.rename(oldPath, newPath)
 
             fs.writeFileSync(path.join(reportDir, 'result.zip'), res.data);
 
-            // extract zip file to result directory (overlay files + prediction file)
+            // extract zip file to report directory (overlay file + prediction file)
             await extract(path.join(reportDir, 'result.zip'), { dir: reportDir })
 
             let modelResult = JSON.parse(fs.readFileSync(path.join(reportDir, '/prediction.txt')));
             // delete zip file
             await fs.promises.unlink(path.join(reportDir, '/result.zip'))
 
-            // delete probability prediction file
+            // delete prediction file
             await fs.promises.unlink(path.join(reportDir, '/prediction.txt'))
 
+            // update report's status + dd probability + filepath
             await webModel.Report.findByIdAndUpdate(report._id, {
                 status: modelStatus.AI_ANNOTATED,
                 DD_probability: modelResult.DD_probability,

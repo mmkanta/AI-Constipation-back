@@ -78,7 +78,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/unauthorizedResponse"
+              $ref: "#/components/badReqResponse"
       500:
         description: Internal server error
         content:
@@ -136,7 +136,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/unauthorizedResponse"
+              $ref: "#/components/badReqResponse"
       500:
         description: Internal server error
         content:
@@ -227,7 +227,7 @@
         content:
           application/json:
             schema:
-              $ref: "#/components/unauthorizedResponse"
+              $ref: "#/components/badReqResponse"
       500:
         description: Internal server error
         content:
@@ -254,7 +254,7 @@
       #   content:
       #     application/json:
       #       schema:
-      #         $ref: "#/components/unauthorizedResponse"
+      #         $ref: "#/components/badReqResponse"
       500:
         description: Internal server error
         content:
@@ -277,13 +277,7 @@ components:
     properties:
       success:
         type: boolean
-      message:
-        type: string
-  unauthorizedResponse:
-    type: object
-    properties:
-      success:
-        type: boolean
+        example: false
       message:
         type: string
   errorResponse:
@@ -291,6 +285,7 @@ components:
     properties:
       success:
         type: boolean
+        example: false
       message:
         type: string
       error:
