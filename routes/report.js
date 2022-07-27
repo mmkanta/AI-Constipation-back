@@ -16,6 +16,9 @@ router.get('/image', reportController.getImage)
 // delete report by id
 router.delete('/delete/:report_id', tokenValidation, verification.clinicianVerification, reportController.deleteById)
 
+// get questionnaire file
+router.get('/questionnaire/:report_id', tokenValidation, reportController.exportQuestionnaire)
+
 // get report by id
 router.get('/:report_id', tokenValidation, reportController.getById)
 

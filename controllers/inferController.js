@@ -8,7 +8,6 @@ const extract = require('extract-zip')
 const dotenv = require('dotenv')
 const { modelStatus, modelTask, hospitalList } = require('../utils/status')
 const { generateShortId } = require('../utils/reusableFunction')
-const XLSX = require('xlsx')
 dotenv.config()
 
 const pyURL = process.env.PY_SERVER + '/api/infer';
@@ -16,19 +15,19 @@ const root = path.join(__dirname, "..");
 
 const questionSchema = {
     questionnaire: Joi.object({
-        DistFreq: Joi.number().min(0).max(6).required(),
-        DistSev: Joi.number().min(0).max(3).required(),
-        DistSevFreq: Joi.number().min(0).max(18).required(),
+        DistFreq: Joi.number().min(0).max(6).integer().required(),
+        DistSev: Joi.number().min(0).max(3).integer().required(),
+        DistSevFreq: Joi.number().min(0).max(18).integer().required(),
         DistDur: Joi.number().min(0).max(240).required(),
-        FreqStool: Joi.number().min(0).max(100).required(),
-        Incomplete: Joi.number().min(0).max(1).required(),
-        Strain: Joi.number().min(0).max(1).required(),
-        Hard: Joi.number().min(0).max(1).required(),
-        Block: Joi.number().min(0).max(1).required(),
-        Digit: Joi.number().min(0).max(1).required(),
-        BloatFreq: Joi.number().min(0).max(6).required(),
-        BloatSev: Joi.number().min(0).max(3).required(),
-        BloatSevFreq: Joi.number().min(0).max(18).required(),
+        FreqStool: Joi.number().min(0).max(100).integer().required(),
+        Incomplete: Joi.number().min(0).max(1).integer().required(),
+        Strain: Joi.number().min(0).max(1).integer().required(),
+        Hard: Joi.number().min(0).max(1).integer().required(),
+        Block: Joi.number().min(0).max(1).integer().required(),
+        Digit: Joi.number().min(0).max(1).integer().required(),
+        BloatFreq: Joi.number().min(0).max(6).integer().required(),
+        BloatSev: Joi.number().min(0).max(3).integer().required(),
+        BloatSevFreq: Joi.number().min(0).max(18).integer().required(),
         BloatDur: Joi.number().min(0).max(240).required(),
         SevScale: Joi.number().min(0).max(10).required()
     }).required()
@@ -84,6 +83,14 @@ const questionnaireInfer = async (req, res) => {
     }
     req.body.questionnaire = validatedQuestion.value.questionnaire
     req.body.personalInfo = validatedInfo.value.personalInfo
+    if (
+        (req.body.questionnaire["DistFreq"] * req.body.questionnaire["DistSev"] != req.body.questionnaire["DistSevFreq"]) ||
+        (req.body.questionnaire["BloatFreq"] * req.body.questionnaire["BloatSev"] != req.body.questionnaire["BloatSevFreq"])
+    )
+        return res.status(400).json({
+            success: false,
+            message: `Invalid input: DistSevFreq or BloatSevFreq is incorrect`
+        })
 
     // convert questionnaire object to array of number
     let questionArr = []
@@ -334,6 +341,14 @@ const integrateInfer = async (req, res) => {
     }
     req.body.questionnaire = validatedQuestion.value.questionnaire
     req.body.personalInfo = validatedInfo.value.personalInfo
+    if (
+        (req.body.questionnaire["DistFreq"] * req.body.questionnaire["DistSev"] != req.body.questionnaire["DistSevFreq"]) ||
+        (req.body.questionnaire["BloatFreq"] * req.body.questionnaire["BloatSev"] != req.body.questionnaire["BloatSevFreq"])
+    )
+        return res.status(400).json({
+            success: false,
+            message: `Invalid input: DistSevFreq or BloatSevFreq is incorrect`
+        })
 
     // convert questionnaire object to array of number
     let questionArr = []
@@ -448,32 +463,19 @@ const integrateInfer = async (req, res) => {
 // generate template
 const generateTemplate = async (req, res) => {
     try {
-        const ws = XLSX.utils.json_to_sheet([
-            { name: "DistFreq" },
-            { name: "DistSev" },
-            // { name: "DistSevFreq" },
-            { name: "DistDur" },
-            { name: "FreqStool" },
-            { name: "Incomplete" },
-            { name: "Strain" },
-            { name: "Hard" },
-            { name: "Block" },
-            { name: "Digit" },
-            { name: "BloatFreq" },
-            { name: "BloatSev" },
-            // { name: "BloatSevFreq" },
-            { name: "BloatDur" },
-            { name: "SevScale" }
-        ], { header: ["name", "value"] })
-        const wb = XLSX.utils.book_new();
+        const file = path.join(root, "/resources/templates/template.xlsx")
+        return res.sendFile(file)
+    } catch (e) {
+        return res.status(500).json({ success: false, message: `Internal server error` })
+    }
 
-        XLSX.utils.book_append_sheet(wb, ws);
-        const wbbuf = XLSX.write(wb, { type: 'buffer' });
+}
 
-        res.writeHead(200, [
-            ['Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
-        ]);
-        return res.end(wbbuf)
+// generate template description
+const generateDescription = async (req, res) => {
+    try {
+        const file = path.join(root, "/resources/templates/template_description.xlsx")
+        return res.sendFile(file)
     } catch (e) {
         return res.status(500).json({ success: false, message: `Internal server error` })
     }
@@ -484,5 +486,6 @@ module.exports = {
     questionnaireInfer,
     imageInfer,
     integrateInfer,
-    generateTemplate
+    generateTemplate,
+    generateDescription
 }

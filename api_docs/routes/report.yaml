@@ -215,6 +215,45 @@
             schema:
               $ref: "#/components/errorResponse"
 
+/getQuestionnaire:
+  get:
+    summary: Export .xlsx questionnaire data
+    tags:
+      - Report
+    security:
+      - bearerAuth: []
+    parameters:
+      - in: path
+        name: report_id
+        schema:
+          type: string
+          example: 628b2f93d001f72cf2d0625f
+    responses:
+      200:
+        description: Success
+        content:
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: file
+      400:
+        description: Invalid input
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/badReqResponse"
+      401:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/badReqResponse"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/errorResponse"
+
 components:
   successResponse:
     type: object

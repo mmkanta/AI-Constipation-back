@@ -17,4 +17,7 @@ router.post('/questionnaire', tokenValidation, inferController.questionnaireInfe
 // generate template
 router.get('/template', inferController.generateTemplate)
 
+// generate template description
+router.get('/template/description', inferController.generateDescription)
+
 module.exports = router;
