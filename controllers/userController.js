@@ -158,7 +158,7 @@ const getById = async (req, res) => {
             .status(200)
             .json({
                 success: true,
-                message: "Get users successfully",
+                message: "Get user successfully",
                 data: user,
             });
     } catch (e) {

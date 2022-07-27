@@ -249,12 +249,27 @@
           application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
             schema:
               type: file
-      # 401:
-      #   description: Unauthorized
-      #   content:
-      #     application/json:
-      #       schema:
-      #         $ref: "#/components/badReqResponse"
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/errorResponse"
+
+/getDescription:
+  get:
+    summary: Get .xlsx questionnaire template description
+    tags:
+      - Inference
+    # security:
+    #   - bearerAuth: []
+    responses:
+      200:
+        description: Success
+        content:
+          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+            schema:
+              type: file
       500:
         description: Internal server error
         content:

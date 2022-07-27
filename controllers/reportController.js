@@ -4,6 +4,7 @@ const fs = require('fs')
 const { generateShortId } = require('../utils/reusableFunction');
 const { modelStatus } = require('../utils/status')
 const Joi = require('joi');
+const XLSX = require('xlsx')
 
 const root = path.join(__dirname, "..");
 
@@ -155,19 +156,19 @@ const update = async (req, res) => {
             success: false,
             message: `Invalid input: "surgery_note" is required`,
         });
-    if (req.body.anorectal_structural_abnormality=="other" && !req.body.anorectal_structural_abnormality_note)
+    if (req.body.anorectal_structural_abnormality == "other" && !req.body.anorectal_structural_abnormality_note)
         return res.status(400).json({
             success: false,
             message: `Invalid input: "anorectal_structural_abnormality_note" is required`,
         });
-    if (req.body.comorbidity=="other" && !req.body.comorbidity_note)
+    if (req.body.comorbidity == "other" && !req.body.comorbidity_note)
         return res.status(400).json({
             success: false,
             message: `Invalid input: "comorbidity_note" is required`,
         });
     req.body.surgery_note = req.body.surgery ? req.body.surgery_note : null
-    req.body.anorectal_structural_abnormality_note = req.body.anorectal_structural_abnormality=="other" ? req.body.anorectal_structural_abnormality_note : null
-    req.body.comorbidity_note = req.body.comorbidity=="other" ? req.body.comorbidity_note : null
+    req.body.anorectal_structural_abnormality_note = req.body.anorectal_structural_abnormality == "other" ? req.body.anorectal_structural_abnormality_note : null
+    req.body.comorbidity_note = req.body.comorbidity == "other" ? req.body.comorbidity_note : null
     req.body.comments = req.body.comments ?? null
 
     try {
@@ -237,10 +238,105 @@ const deleteById = async (req, res) => {
     }
 }
 
+// generate questionnaire file data
+const exportQuestionnaire = async (req, res) => {
+    try {
+        const report = await webModel.Report.findById(req.params.report_id).populate("question_id")
+
+        if (!report) return res.status(400).json({ success: false, message: 'Report not found' })
+        if (!report.question_id)
+            return res.status(400).json({
+                success: false,
+                message: `Report ${req.params.report_id} has no questionnaire`
+            })
+
+        // create xlsx file from json
+        const ws = XLSX.utils.json_to_sheet([
+            {
+                name: "DistFreq",
+                description: "1. ท่านมี “อาการอึดอัดแน่นท้อง” หรือไม่",
+                value: report.question_id["DistFreq"]
+            },
+            {
+                name: "DistSev",
+                description: "1.1. ระดับความรุนแรงของอาการมากน้อยเพียงไร",
+                value: report.question_id["DistSev"]
+            },
+            {
+                name: "DistDur",
+                description: "1.2. ท่านสังเกตว่าท่านมีอาการอึดอัดแน่นท้องติดต่อกันมาเป็นเวลากี่เดือน",
+                value: report.question_id["DistDur"]
+            },
+            {
+                name: "FreqStool",
+                description: "2. ท่านถ่ายอุจจาระกี่ครั้งต่อสัปดาห์",
+                value: report.question_id["FreqStool"]
+            },
+            {
+                name: "Incomplete",
+                description: "3. ท่านรู้สึกถ่ายไม่สุดมากกว่า 25% ของจำนวนครั้งของการถ่ายอุจจาระหรือไม่",
+                value: report.question_id["Incomplete"]
+            },
+            {
+                name: "Strain",
+                description: "4. ท่านมีอาการต้องเบ่งถ่ายมากกว่าปกติ มากกว่า 25% ของจำนวนครั้งของการถ่ายหรือไม่",
+                value: report.question_id["Strain"]
+            },
+            {
+                name: "Hard",
+                description: "5. ท่านมีอาการอุจจาระแข็งมากกว่าปกติ มากกว่า 25% ของจำนวนครั้งของการถ่ายหรือไม่",
+                value: report.question_id["Hard"]
+            },
+            {
+                name: "Block",
+                description: "6. ท่านรู้สึกว่ามีอะไรอุดตันหรืออุดกั้นที่ทวารหนักเวลาถ่าย มากกว่า 25% ของจำนวนครั้งของการถ่ายหรือไม่",
+                value: report.question_id["Block"]
+            },
+            {
+                name: "Digit",
+                description: "7. ท่านต้องใช้นิ้วมือช่วยในการถ่ายอุจจาระ มากกว่า 25% ของจำนวนครั้งของการถ่ายหรือไม่",
+                value: report.question_id["Digit"]
+            },
+            {
+                name: "BloatFreq",
+                description: "8. ท่านมีอาการ “อืดแน่นท้องหรือมีลมมากในท้อง” หรือไม่",
+                value: report.question_id["BloatFreq"]
+            },
+            {
+                name: "BloatSev",
+                description: "8.1. ระดับความรุนแรงของอาการมากน้อยเพียงไร",
+                value: report.question_id["BloatSev"]
+            },
+            {
+                name: "BloatDur",
+                description: "8.2. ระยะเวลาที่เป็นทั้งหมดกี่เดือน",
+                value: report.question_id["BloatDur"]
+            },
+            {
+                name: "SevScale",
+                description: "9. ความรุนแรงของอาการทางเดินอาหารทั้งหมดโดยรวมอยู่ในระดับใด",
+                value: report.question_id["SevScale"]
+            }
+        ], { header: ["name", "description", "value"] })
+        const wb = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(wb, ws);
+        const wbbuf = XLSX.write(wb, { type: 'buffer' });
+
+        res.writeHead(200, [
+            ['Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+        ]);
+        return res.end(wbbuf)
+    } catch (e) {
+        return res.status(500).json({ success: false, message: 'Internal server error', error: e.message })
+    }
+}
+
 module.exports = {
     getImage,
     viewResult,
     getById,
     update,
-    deleteById
+    deleteById,
+    exportQuestionnaire
 }

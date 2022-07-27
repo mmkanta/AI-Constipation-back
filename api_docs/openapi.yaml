@@ -36,6 +36,8 @@ paths:
     $ref: "./routes/infer.yaml#/~1integrate"
   /infer/template:
     $ref: "./routes/infer.yaml#/~1getTemplate"
+  /infer/template/description:
+    $ref: "./routes/infer.yaml#/~1getDescription"
 
   # report
   /reports:
@@ -48,3 +50,5 @@ paths:
     $ref: "./routes/report.yaml#/~1getImage"
   /reports/delete/{report_id}:
     $ref: "./routes/report.yaml#/~1deleteById"
+  /reports/questionnaire/{report_id}:
+    $ref: "./routes/report.yaml#/~1getQuestionnaire"
