@@ -209,9 +209,12 @@ const deleteById = async (req, res) => {
             ["question_id", "personal_info_id", "original_path", "gradcam_path"]
         )
 
+        if (!report)
+            return res.status(400).json({ success: false, message: 'Report not found' })
+
         // delete report's directory
-        if (report.original_path) {
-            let resultDir = report.original_path.split('/')
+        if (report.gradcam_path) {
+            let resultDir = report.gradcam_path.split('/')
             resultDir.pop()
             resultDir = resultDir.join('/')
             resultDir = path.join(root, resultDir)
@@ -226,7 +229,7 @@ const deleteById = async (req, res) => {
         const question = await webModel.Questionnaire.findByIdAndDelete(report.question_id)
 
         return res.status(200).json({
-            success: true, message: 'Update report successfully', data: {
+            success: true, message: `Delete report successfully`, data: {
                 report_index: generateShortId(deletedReport?.id),
                 report_id: deletedReport?.id,
                 personal_info_id: personalInfo?.id,

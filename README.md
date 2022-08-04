@@ -113,3 +113,7 @@
    ```
    npm run initDB
    ```
+   or
+   ```
+   npm run initAdmin
+   ```

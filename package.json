@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "start": "nodemon ./bin/www",
-    "initDB": "node ./db/migration/aiwebMigration.js"
+    "initDB": "node ./db/migration/aiwebMigration.js",
+    "initAdmin": "node ./db/migration/adminMigration.js"
   },
   "dependencies": {
     "axios": "^0.27.2",

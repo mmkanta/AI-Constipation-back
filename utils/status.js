@@ -1,5 +1,5 @@
 const modelStatus = {
-    WAITING: "waiting",
+    // WAITING: "waiting",
     IN_PROGRESS: "in progress",
     AI_ANNOTATED: "annotated",
     HUMAN_ANNOTATED: "reviewed",
